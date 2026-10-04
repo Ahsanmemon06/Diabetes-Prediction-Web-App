@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiaGuard AI — Diabetes Diagnostic Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Top Navigation Bar -->
+    <header class="navbar">
+        <div class="nav-brand">
+            <span class="logo-dot"></span>
+            <h1>DiaGuard <span>AI</span></h1>
+        </div>
+        <div class="nav-badge">XGBoost Diagnostics v1.0</div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="page-wrapper">
+        <div class="hero-section">
+            <span class="pill-tag">Clinical Risk Assessment</span>
+            <h2>Early Diabetes Prediction Engine</h2>
+            <p>Enter essential clinical indicators below to calculate patient diagnosis and probability using a calibrated gradient-boosted decision model.</p>
+        </div>
+
+        <div class="portal-grid">
+            <!-- Left Side: Form -->
+            <section class="card form-card">
+                <div class="card-header">
+                    <h3>Patient Parameters</h3>
+                    <p>Provide patient metrics for analysis</p>
+                </div>
+
+                <form action="/predict" method="POST" class="assessment-form">
+                    <div class="input-grid">
+                        <div class="form-group">
+                            <label for="age">Patient Age</label>
+                            <input type="number" id="age" name="age" step="1" min="1" max="120" placeholder="Years (e.g. 45)" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="bmi">Body Mass Index (BMI)</label>
+                            <input type="number" id="bmi" name="bmi" step="0.1" min="10" max="70" placeholder="kg/m² (e.g. 27.5)" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="HbA1c_level">HbA1c Level</label>
+                            <input type="number" id="HbA1c_level" name="HbA1c_level" step="0.1" min="3.0" max="15.0" placeholder="% (e.g. 6.2)" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="blood_glucose_level">Blood Glucose Level</label>
+                            <input type="number" id="blood_glucose_level" name="blood_glucose_level" step="1" min="50" max="400" placeholder="mg/dL (e.g. 140)" required>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="hypertension">Hypertension (High BP History)</label>
+                            <select id="hypertension" name="hypertension" required>
+                                <option value="0">Negative (Normal Blood Pressure)</option>
+                                <option value="1">Positive (Diagnosed Hypertension)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn">
+                        <span>Run Model Prediction</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </button>
+                </form>
+            </section>
+
+            <!-- Right Side: Diagnostics Output & Guide -->
+            <aside class="card result-card">
+                <div class="card-header">
+                    <h3>Diagnostic Summary</h3>
+                    <p>Clinical inference report</p>
+                </div>
+
+                {% if prediction_text %}
+                <div class="result-display {% if prediction_text == 'Diabetic' %}status-danger{% else %}status-safe{% endif %}">
+                    <div class="result-badge">Evaluation Outcome</div>
+                    <div class="result-title">{{ prediction_text }}</div>
+                    
+                    <div class="probability-metric">
+                        <span class="prob-label">Estimated Diabetic Risk</span>
+                        <span class="prob-value">{{ risk_text }}%</span>
+                    </div>
+
+                    <div class="progress-bar-bg">
+    <div class="progress-bar-fill" id="riskBar" data-risk="{{ risk_text }}"></div>
+</div>
+
+<script>
+    const bar = document.getElementById('riskBar');
+    if (bar) {
+        bar.style.width = bar.getAttribute('data-risk') + '%';
+    }
+</script>
+
+                    <p class="result-note">
+                        {% if prediction_text == 'Diabetic' %}
+                        High statistical alignment with diabetes profiles. Prioritize glucose tolerance and insulin resistance checks.
+                        {% else %}
+                        Vitals remain within statistically lower glycemic risk bands. Standard periodic monitoring advised.
+                        {% endif %}
+                    </p>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">📊</div>
+                    <h4>No Assessment Run Yet</h4>
+                    <p>Fill in patient values on the left and submit to view classified risk probability and clinical flags.</p>
+                </div>
+                {% endif %}
+
+                <!-- Benchmarks Reference Box -->
+                <div class="benchmarks-box">
+                    <span class="benchmark-title">Clinical References</span>
+                    <ul>
+                        <li><span>Normal Fasting:</span> <strong>70–99 mg/dL</strong></li>
+                        <li><span>Pre-diabetes Fasting:</span> <strong>100–125 mg/dL</strong></li>
+                        <li><span>Standard HbA1c:</span> <strong>&lt; 5.7%</strong></li>
+                        <li><span>Diabetes Threshold:</span> <strong>≥ 6.5%</strong></li>
+                    </ul>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <footer class="footer">
+        DiaGuard AI System • Machine Learning Portfolio Suite
+    </footer>
+
+</body>
+</html>
